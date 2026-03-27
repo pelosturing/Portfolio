@@ -1,0 +1,105 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Nav from "@/components/nav.astro";
+import Footer from "@/components/footer.astro";
+import BlogPostCard from "@/components/BlogPostCard.astro";
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection("blog");
+const posts = allPosts
+  .filter((post) => !post.data.draft || import.meta.env.DEV)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const allTags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+---
+
+<Layout title="Blog — Reed" description="Reed's blog on system development, multimedia, and software engineering.">
+  <Nav />
+  <section class="py-12 md:py-24 border-t border-[#ffffff10] text-[var(--white)]">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-lg text-[var(--sec)] mb-2 shiny-sec">Thoughts & Notes</h2>
+      <h3 class="text-4xl md:text-5xl font-medium mb-8">Blog</h3>
+
+      {
+        allTags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mb-8" id="tag-filter">
+            <button
+              class="tag-btn active text-sm px-3 py-1.5 rounded-full border border-[var(--white-icon-tr)] bg-[var(--sec)] text-[var(--background)] transition-all duration-300"
+              data-tag="all"
+            >
+              All
+            </button>
+            {allTags.map((tag) => (
+              <button
+                class="tag-btn text-sm px-3 py-1.5 rounded-full border border-[var(--white-icon-tr)] bg-[#1414149c] text-[var(--white-icon)] hover:text-white hover:border-[var(--sec)] transition-all duration-300"
+                data-tag={tag}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        posts.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="posts-grid">
+            {posts.map((post) => (
+              <BlogPostCard
+                title={post.data.title}
+                pubDate={post.data.pubDate}
+                description={post.data.description}
+                tags={post.data.tags}
+                slug={post.id}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="flex flex-col items-center justify-center py-16 text-[var(--white-icon)]">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="size-12 mb-4 opacity-30"
+            >
+              <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z" />
+            </svg>
+            <p class="text-lg">No posts yet. Stay tuned!</p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+  <Footer />
+</Layout>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const tagBtns = document.querySelectorAll<HTMLButtonElement>(".tag-btn");
+    const cards = document.querySelectorAll<HTMLElement>("#posts-grid > a");
+
+    if (tagBtns.length === 0) return;
+
+    tagBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tag = btn.dataset.tag;
+
+        tagBtns.forEach((b) => {
+          b.classList.remove("active", "bg-[var(--sec)]", "text-[var(--background)]");
+          b.classList.add("bg-[#1414149c]", "text-[var(--white-icon)]");
+        });
+        btn.classList.add("active", "bg-[var(--sec)]", "text-[var(--background)]");
+        btn.classList.remove("bg-[#1414149c]", "text-[var(--white-icon)]");
+
+        cards.forEach((card) => {
+          if (tag === "all") {
+            card.style.display = "";
+          } else {
+            const cardTags = card.dataset.tags?.split(",") || [];
+            card.style.display = cardTags.includes(tag!) ? "" : "none";
+          }
+        });
+      });
+    });
+  });
+</script>

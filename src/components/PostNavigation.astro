@@ -1,0 +1,47 @@
+---
+interface PostLink {
+  slug: string;
+  title: string;
+}
+
+interface Props {
+  prev: PostLink | null;
+  next: PostLink | null;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="flex flex-col sm:flex-row justify-between gap-4 mt-12 pt-8 border-t border-[#ffffff10]">
+      {prev ? (
+        <a
+          href={`/blog/${prev.slug}`}
+          class="flex-1 bg-[#1414149c] border border-[var(--white-icon-tr)] rounded-2xl p-4 transition-all duration-300 hover:border-[var(--sec)] group"
+        >
+          <span class="text-sm text-[var(--white-icon)]">&larr; Previous</span>
+          <p class="text-[var(--white)] mt-1 group-hover:text-[var(--sec)] transition-colors duration-300">
+            {prev.title}
+          </p>
+        </a>
+      ) : (
+        <div class="flex-1" />
+      )}
+
+      {next ? (
+        <a
+          href={`/blog/${next.slug}`}
+          class="flex-1 bg-[#1414149c] border border-[var(--white-icon-tr)] rounded-2xl p-4 transition-all duration-300 hover:border-[var(--sec)] group text-right"
+        >
+          <span class="text-sm text-[var(--white-icon)]">Next &rarr;</span>
+          <p class="text-[var(--white)] mt-1 group-hover:text-[var(--sec)] transition-colors duration-300">
+            {next.title}
+          </p>
+        </a>
+      ) : (
+        <div class="flex-1" />
+      )}
+    </nav>
+  )
+}

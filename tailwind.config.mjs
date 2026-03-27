@@ -13,7 +13,25 @@ export default {
       animation: {
         scale: 'scaleAnim 300ms ease-in-out',
       },
+      typography: {
+        invert: {
+          css: {
+            '--tw-prose-body': '#d4d4d4',
+            '--tw-prose-headings': '#dfdfdf',
+            '--tw-prose-links': '#a476ff',
+            '--tw-prose-bold': '#dfdfdf',
+            '--tw-prose-code': '#a476ff',
+            '--tw-prose-pre-bg': '#1a1a1a',
+            '--tw-prose-pre-code': '#d4d4d4',
+            '--tw-prose-quotes': '#d4d4d4',
+            '--tw-prose-quote-borders': '#a476ff',
+            '--tw-prose-hr': '#ffffff10',
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };

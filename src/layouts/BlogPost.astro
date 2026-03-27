@@ -1,0 +1,70 @@
+---
+import Layout from "./Layout.astro";
+import Nav from "@/components/nav.astro";
+import Footer from "@/components/footer.astro";
+
+interface Props {
+  title: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  description: string;
+  tags: string[];
+}
+
+const { title, pubDate, updatedDate, description, tags } = Astro.props;
+
+const formattedPubDate = pubDate.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const formattedUpdatedDate = updatedDate?.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<Layout title={`${title} — Reed`} description={description}>
+  <Nav />
+  <main class="max-w-3xl mx-auto py-12 md:py-24 text-[var(--white)]">
+    <header class="mb-10">
+      <a
+        href="/blog"
+        class="text-sm text-[var(--white-icon)] hover:text-[var(--sec)] transition-colors duration-300 inline-flex items-center gap-1 mb-6"
+      >
+        &larr; Back to Blog
+      </a>
+      <h1 class="text-4xl md:text-5xl font-medium leading-tight">{title}</h1>
+      <div class="flex flex-wrap items-center gap-3 mt-4 text-sm text-[var(--white-icon)]">
+        <time>{formattedPubDate}</time>
+        {
+          formattedUpdatedDate && (
+            <span>
+              (Updated: {formattedUpdatedDate})
+            </span>
+          )
+        }
+      </div>
+      {
+        tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-4">
+            {tags.map((tag) => (
+              <span class="text-xs px-2 py-1 rounded-full bg-[var(--white-icon-tr)] text-[var(--white-icon)]">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <article class="prose prose-invert prose-lg max-w-none">
+      <slot />
+    </article>
+
+    <slot name="post-nav" />
+  </main>
+  <Footer />
+</Layout>

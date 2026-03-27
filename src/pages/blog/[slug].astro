@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogPost from "@/layouts/BlogPost.astro";
+import PostNavigation from "@/components/PostNavigation.astro";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("blog");
+  const posts = allPosts
+    .filter((post) => !post.data.draft || import.meta.env.DEV)
+    .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
+
+  return posts.map((post, index) => {
+    const prev = index > 0 ? posts[index - 1] : null;
+    const next = index < posts.length - 1 ? posts[index + 1] : null;
+
+    return {
+      params: { slug: post.id },
+      props: {
+        post,
+        prev: prev ? { slug: prev.id, title: prev.data.title } : null,
+        next: next ? { slug: next.id, title: next.data.title } : null,
+      },
+    };
+  });
+}
+
+const { post, prev, next } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BlogPost
+  title={post.data.title}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  description={post.data.description}
+  tags={post.data.tags}
+>
+  <Content />
+  <PostNavigation slot="post-nav" prev={prev} next={next} />
+</BlogPost>
